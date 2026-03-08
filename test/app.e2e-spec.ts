@@ -16,6 +16,8 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
+  afterAll(async () => app.close())
+
   it('/ (GET)', () => {
     return request(app.getHttpServer())
       .get('/')
