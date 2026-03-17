@@ -59,8 +59,7 @@ Features
 	•	GET /health
 	•	request logging with duration
 	•	requestId:
-	•	if client sends x-request-id → reuse
-	•	else generate
+	•	if client sends x-request-id → reuse else generate
 	•	always return x-request-id in response headers
 	•	graceful shutdown on SIGTERM/SIGINT
 
