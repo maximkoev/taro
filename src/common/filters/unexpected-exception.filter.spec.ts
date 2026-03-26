@@ -1,5 +1,5 @@
 import { HttpAdapterHost } from '@nestjs/core';
-import { HttpStatus, HttpException } from '@nestjs/common';
+import { HttpStatus, HttpException, Logger } from '@nestjs/common';
 import { UnexpectedErrorsFilter } from './unexpected-exception.filter';
 
 describe('UnexpectedErrorsFilter', () => {
@@ -7,7 +7,7 @@ describe('UnexpectedErrorsFilter', () => {
     const reply = jest.fn();
     const httpAdapterHost = {
       httpAdapter: { reply },
-    } as unknown as HttpAdapterHost;
+    };
     const filter = new UnexpectedErrorsFilter(httpAdapterHost);
 
     const exception = new HttpException({ ok: false }, HttpStatus.BAD_REQUEST);
@@ -28,7 +28,7 @@ describe('UnexpectedErrorsFilter', () => {
     const reply = jest.fn();
     const httpAdapterHost = {
       httpAdapter: { reply },
-    } as unknown as HttpAdapterHost;
+    };
     const filter = new UnexpectedErrorsFilter(httpAdapterHost);
 
     const exception = new Error('boom');
@@ -38,6 +38,10 @@ describe('UnexpectedErrorsFilter', () => {
         getResponse: () => ({ r: true }),
       }),
     };
+
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => undefined);
 
     filter.catch(exception, ctx as any);
 
@@ -50,5 +54,15 @@ describe('UnexpectedErrorsFilter', () => {
       }),
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
+
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'An unexpected error occurred',
+        requestId: 'abc-123',
+      }),
+      expect.stringContaining('Error: boom'),
+    );
+
+    loggerSpy.mockRestore();
   });
 });
