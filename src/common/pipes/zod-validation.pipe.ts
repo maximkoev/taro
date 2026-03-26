@@ -9,7 +9,7 @@ import * as z from 'zod';
 export class ZodValidationPipe implements PipeTransform {
   constructor(private schema: z.ZodSchema) {}
 
-  transform(value: unknown, metadata: ArgumentMetadata): unknown {
+  transform(value: unknown): unknown {
     let validated: unknown;
     try {
       validated = this.schema.parse(value);

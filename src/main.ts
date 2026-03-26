@@ -1,10 +1,13 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { Logger } from '@nestjs/common';
+import { UnexpectedErrorsFilter } from './common/filters/unexpected-exception.filter';
 
 const logger = new Logger('Bootstrap');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const host = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new UnexpectedErrorsFilter(host));
   app.setGlobalPrefix('v1', { exclude: ['health'] });
   app.enableShutdownHooks(['SIGTERM', 'SIGINT']);
   app.enableCors();
