@@ -1,7 +1,12 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 import { uuidRegex } from '../common/utils/uuid.util';
 import { createE2EApp } from './e2e.setup';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../app/app.module';
+import { TarotService } from '../tarot/tarot.service';
+import { HttpAdapterHost } from '@nestjs/core';
+import { UnexpectedErrorsFilter } from '../common/filters/unexpected-exception.filter';
 
 describe('E2E', () => {
   let app: INestApplication;
@@ -218,6 +223,43 @@ describe('E2E', () => {
             res.body.errors.find((e: any) => e.path === 'question'),
           ).toBeTruthy();
         });
+    });
+
+    it('returns 500 and internal server error body when service throws', async () => {
+      const mock = {
+        tarot: jest.fn().mockImplementation(() => {
+          throw new Error('unexpected');
+        }),
+      };
+
+      const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+        .overrideProvider(TarotService)
+        .useValue(mock)
+        .compile();
+
+      const appWithMock = moduleRef.createNestApplication();
+      const host = appWithMock.get(HttpAdapterHost);
+      appWithMock.useGlobalFilters(new UnexpectedErrorsFilter(host));
+      appWithMock.setGlobalPrefix('v1', { exclude: ['health'] });
+      await appWithMock.init();
+
+      const payload = { question: 'Boom', cards: 3, style: 'soft' };
+
+      await request(appWithMock.getHttpServer())
+        .post('/v1/tarot')
+        .send(payload)
+        .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+        .expect((res) => {
+          expect(res.body).toHaveProperty(
+            'statusCode',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+          expect(res.body).toHaveProperty('message', 'Internal server error');
+          expect(res.body).toHaveProperty('timestamp');
+          expect(res.headers['x-request-id']).toMatch(uuidRegex);
+        });
+
+      await appWithMock.close();
     });
   });
 });

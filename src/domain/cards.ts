@@ -22,6 +22,8 @@ export class Deck {
 
   private assertIsNonNegativeInteger(value: unknown): asserts value is number {
     if (!isNonNegativeInteger(value))
-      throw new RangeError(`Expected a non-negative integer, got ${value}`);
+      throw new RangeError(
+        `Expected a non-negative integer, got ${String(value)}`,
+      );
   }
 }
