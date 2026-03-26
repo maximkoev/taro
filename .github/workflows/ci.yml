@@ -63,7 +63,7 @@ jobs:
         run: npm ci
 
       - name: Generate code coverage report
-        run: npm run test:coverage
+        run: npm run test:cov
 
   build:
     name: Build
