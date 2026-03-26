@@ -1,6 +1,6 @@
-import { HttpAdapterHost } from '@nestjs/core';
 import { HttpStatus, HttpException, Logger } from '@nestjs/common';
 import { UnexpectedErrorsFilter } from './unexpected-exception.filter';
+import { HttpAdapterHost } from '@nestjs/core';
 
 describe('UnexpectedErrorsFilter', () => {
   it('should reply with the http exception response when HttpException is thrown', () => {
@@ -8,7 +8,9 @@ describe('UnexpectedErrorsFilter', () => {
     const httpAdapterHost = {
       httpAdapter: { reply },
     };
-    const filter = new UnexpectedErrorsFilter(httpAdapterHost);
+    const filter = new UnexpectedErrorsFilter(
+      httpAdapterHost as HttpAdapterHost,
+    );
 
     const exception = new HttpException({ ok: false }, HttpStatus.BAD_REQUEST);
     const ctx: any = {
