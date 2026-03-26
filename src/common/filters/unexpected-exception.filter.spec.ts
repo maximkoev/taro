@@ -8,9 +8,7 @@ describe('UnexpectedErrorsFilter', () => {
     const httpAdapterHost = {
       httpAdapter: { reply },
     };
-    const filter = new UnexpectedErrorsFilter(
-      httpAdapterHost as HttpAdapterHost,
-    );
+    const filter = new UnexpectedErrorsFilter(httpAdapterHost as any);
 
     const exception = new HttpException({ ok: false }, HttpStatus.BAD_REQUEST);
     const ctx: any = {
@@ -31,7 +29,9 @@ describe('UnexpectedErrorsFilter', () => {
     const httpAdapterHost = {
       httpAdapter: { reply },
     };
-    const filter = new UnexpectedErrorsFilter(httpAdapterHost);
+    const filter = new UnexpectedErrorsFilter(
+      httpAdapterHost as any as HttpAdapterHost,
+    );
 
     const exception = new Error('boom');
     const ctx: any = {
