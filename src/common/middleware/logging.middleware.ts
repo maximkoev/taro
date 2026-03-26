@@ -7,8 +7,7 @@ export class LoggerMiddleware implements NestMiddleware {
     const ts = Date.now();
     res.on('finish', () => {
       const log: TLog = {
-        requestId:
-          (req as any).requestId ?? req.header('x-request-id') ?? 'unknown',
+        requestId: req.requestId ?? req.header('x-request-id') ?? 'unknown',
         method: req.method,
         url: req.originalUrl,
         statusCode: res.statusCode,

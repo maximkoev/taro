@@ -71,7 +71,7 @@ DoD
 #### M2 — Tarot reading v1 (no real LLM)
 
 Features
-	•	POST /v1/tarot/reading with DTO validation
+	•	POST /v1/tarot with DTO validation
 	•	generates a 3-card spread (random from a predefined deck)
 	•	returns stub interpretation (no external calls yet)
 
@@ -118,7 +118,7 @@ src/
     domain/
     llm/
 test/
-  tarot.e2e-spec.ts
+  tarot-e2e.spec.ts
 ````
 ## Local development
 
