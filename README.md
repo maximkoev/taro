@@ -118,7 +118,7 @@ src/
     domain/
     llm/
 test/
-  tarot.e2e-spec.ts
+  tarot-e2e.spec.ts
 ````
 ## Local development
 
