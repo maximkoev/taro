@@ -1,31 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Deck } from '../domain/cards';
-import { PredictionTarotDTO, QuestionTarotDTO } from './tarot.schema';
+import { LlmPort } from './llm/llm.port';
+import {
+  PredictionTarotDTO,
+  QuestionTarotDTO,
+  Style,
+} from './schema/tarot.schema';
+import { Card } from '../domain/card';
 
 @Injectable()
 export class TarotService {
-  tarot(question: QuestionTarotDTO): PredictionTarotDTO {
-    const cards = new Deck().draw(question.cards);
-    return askAI(question, cards);
-  }
-}
+  constructor(@Inject(LlmPort) private readonly llm: LlmPort) {}
 
-function askAI(
-  question: QuestionTarotDTO,
-  cards: string[],
-): PredictionTarotDTO {
-  const prediction = buildPrediction(question, cards);
-  return {
-    question: question.question,
-    cards,
-    prediction,
-  };
-}
-
-function buildPrediction(question: QuestionTarotDTO, cards: string[]): string {
-  const base = `For your question "${question.question}", the cards drawn (${cards.join(', ')}) suggest a gentle and optimistic outlook. The prediction is: `;
-  if (question.style === 'soft') {
-    return `${base} things will likely unfold in a positive manner, with opportunities for growth and happiness. Embrace the journey with an open heart.`;
+  tarot(req: QuestionTarotDTO): Promise<PredictionTarotDTO> {
+    const cards = new Deck().draw(req.cards);
+    return this.buildPrediction(req.question, req.style, cards);
   }
-  return `${base} there may be challenges ahead, but with resilience and determination, you can overcome them. Stay strong and keep moving forward.`;
+
+  async buildPrediction(
+    question: QuestionTarotDTO['question'],
+    style: Style,
+    cards: Card[],
+  ): Promise<PredictionTarotDTO> {
+    const cs = cards.map((card) => card.name);
+    const prediction = await this.llm.getPrediction(question, style, cards);
+    return {
+      question,
+      cards: cs,
+      prediction,
+    };
+  }
 }

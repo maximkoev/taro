@@ -12,6 +12,6 @@ describe('HealthService', () => {
   });
 
   it('getHealth should return OK', () => {
-    expect(service.getHealth()).toBe('OK');
+    expect(service.getHealth()).toStrictEqual({ status: 'ok' });
   });
 });

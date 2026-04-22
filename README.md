@@ -1,38 +1,43 @@
-# Taro — Tarot Reading API (NestJS + TypeScript)
+# Taro — Tarot Reading API
 
-Small backend project to practice **Node.js / TypeScript / NestJS** in an “enterprise-ish” way: structured project layout, validation, logging, tests, Docker, and later — persistence and rate limiting.
+Small backend learning project for practicing Node.js, TypeScript, and NestJS in an "enterprise-ish" style: modular structure, request validation, middleware, exception handling, tests, and later external integrations and persistence.
 
 ## Goal
 
 Build an HTTP service that:
-1. Accepts a tarot reading request (question + style).
-2. Generates a spread (random cards).
-3. Builds a prompt for an LLM.
-4. Calls an LLM provider (first **fake adapter**, later real).
-5. Returns a structured response.
+1. Accepts a tarot reading request.
+2. Draws a random spread from a predefined deck.
+3. Produces a reading response.
+4. Later delegates interpretation to an LLM adapter.
 
-This repo is built iteratively via small PRs (milestones), with a clear Definition of Done (DoD) per milestone.
+The project is developed milestone by milestone so each change can be delivered as a small PR with a clear Definition of Done.
 
-## Tech Stack
+## Current Stack
 
 - Node.js 20+
 - TypeScript
 - NestJS
-- Jest + Supertest (e2e)
-- Zod (request validation)
-- Pino / nestjs-pino (structured logging)
-- Docker
-- (Later) Postgres, Redis
+- Jest + Supertest
+- Zod
 
-## API (planned)
+Planned later:
+- Real LLM provider integration
+- Structured logging with `pino` / `nestjs-pino`
+- Postgres
+- Redis
+
+## Current API
 
 ### Health
-- `GET /health` → `{ "status": "ok" }`
 
-### Tarot reading (v1)
-- `POST /v1/tarot/reading`
+- `GET /health` -> `{ "status": "ok" }`
+
+### Tarot reading
+
+- `POST /v1/tarot`
 
 Request:
+
 ```json
 {
   "question": "Should I change my job?",
@@ -40,111 +45,150 @@ Request:
   "cards": 3
 }
 ```
-### Milestones
 
-Each milestone should be delivered as a small PR.
+Notes:
+- `style`: `soft` or `hard`
+- `cards`: `3` or `6`
 
-#### M0 — Project bootstrap
+Example response:
 
-DoD
-	•	npm run dev starts the server
-	•	npm run test runs successfully
-	•	npm run build produces a build
-	•	Tooling is consistent (TS modules strategy, Jest config, lint)
-	•	README contains scope + milestones
+```json
+{
+  "question": "Should I change my job?",
+  "cards": ["The Fool", "Justice", "The Star"],
+  "prediction": "..."
+}
+```
 
-#### M1 — Health + basic infrastructure
+## Test Strategy
 
-Features
-	•	GET /health
-	•	request logging with duration
-	•	requestId:
-	•	if client sends x-request-id → reuse else generate
-	•	always return x-request-id in response headers
-	•	graceful shutdown on SIGTERM/SIGINT
+- `npm test` runs all specs together
+- Unit-style and e2e-style tests share the same Jest setup because the suite is small and fast
+- E2E bootstrap lives in `src/specs/e2e.setup.ts`
+- `createE2EApp()` mirrors the real app bootstrap from `src/main.ts`:
+  - global prefix `v1` with `/health` excluded
+  - global unexpected error filter
+  - shutdown hooks
+  - CORS
 
-DoD
-	•	/health works
-	•	every request is logged with requestId
-	•	server stops gracefully (no hanging process)
+## Milestones
 
-#### M2 — Tarot reading v1 (no real LLM)
+### M0 — Project bootstrap
 
-Features
-	•	POST /v1/tarot with DTO validation
-	•	generates a 3-card spread (random from a predefined deck)
-	•	returns stub interpretation (no external calls yet)
+DoD:
+- `npm run start:dev` starts the server
+- `npm test` runs successfully
+- `npm run build` produces a build
+- Tooling is consistent
+- README contains scope and milestones
 
-DoD
-	•	validation errors return 400 with readable field errors
-	•	controller stays thin, logic in service
-	•	e2e tests:
-	•	happy path
-	•	bad request
+### M1 — Health + basic infrastructure
 
-#### M3 — LLM adapter (fake → real)
+Features:
+- `GET /health`
+- request logging with duration
+- `x-request-id` reuse or generation
+- always return `x-request-id` in response headers
+- graceful shutdown on `SIGTERM` / `SIGINT`
+- global unexpected error handling
 
-Features
-	•	LlmPort interface
-	•	FakeLlmAdapter (deterministic text for tests)
-	•	provider switch via env: LLM_PROVIDER=fake|openai (or similar)
+DoD:
+- `/health` works
+- every request is logged with `requestId`
+- server stops gracefully
 
-DoD
-	•	tests do not require a real API key
-	•	external calls have timeouts
-	•	config comes from env
+### M2 — Tarot reading v1 (no real LLM)
 
-(Optional) M4 — Persistence (Postgres)
-	•	store reading history
-	•	GET /v1/tarot/readings/:id
+Features:
+- `POST /v1/tarot` with request validation
+- generate a random spread from a predefined deck
+- return stub interpretation without external calls
 
-(Optional) M5 — Rate limiting / cache (Redis)
-	•	rate limit by IP or API key
+DoD:
+- validation errors return `400` with readable field errors
+- controller stays thin, logic stays in service
+- tests cover happy path, validation failures, and unexpected error handling
 
-Project structure (target)
-````
+### M4 — LLM adapter (fake -> real)
+
+Features:
+- `LlmPort` interface
+- `FakeLlmAdapter` for deterministic tests
+- provider switch via env such as `LLM_PROVIDER=fake|openai`
+
+DoD:
+- tests do not require a real API key
+- external calls have timeouts
+- provider config comes from env
+
+### M4.1 — Persistence (optional)
+
+- store reading history
+- `GET /v1/tarot/readings/:id`
+
+### M5 — Rate limiting / cache (optional)
+
+- rate limit by IP or API key
+
+## Project Structure
+
+```text
 src/
-  main.ts
-  app.module.ts
+  app/
   common/
-    config/
-    logging/
-    errors/
+    decorators/
+    filters/
+    middleware/
+    pipes/
+    utils/
+  domain/
+  health/
+  specs/
   tarot/
-    tarot.module.ts
-    tarot.controller.ts
-    tarot.service.ts
-    dto/
-    domain/
-    llm/
-test/
-  tarot-e2e.spec.ts
-````
-## Local development
+  types/
+  main.ts
+```
 
-``npm i``
+## Local Development
 
-``npm run dev``
+Install dependencies:
 
-Run tests:
+```bash
+npm i
+```
 
-``npm test``
+Run in watch mode:
 
-Build
+```bash
+npm run start:dev
+```
 
-``npm run build``
+Run all tests:
 
-## Environment variables (planned)
-•	PORT=3000
-•	LOG_LEVEL=info
-•	LLM_PROVIDER=fake|openai
-•	LLM_API_KEY=... (when real provider is added)
+```bash
+npm test
+```
 
+Build:
+
+```bash
+npm run build
+```
+
+## Environment Variables
+
+Current:
+- `PORT=3000`
+
+Planned for M3:
+- `LLM_PROVIDER=fake|openai`
+- `LLM_API_KEY=...`
 
 ## Notes
 
-This project is intentionally built “step-by-step” to practice:
-•	TS config / module system consistency
-•	API design + validation
-•	logging/metrics/shutdown
-•	e2e tests and CI-friendly tooling
+This project is intentionally built step by step to practice:
+- NestJS modules and request lifecycle
+- TypeScript and validation
+- API design and error handling
+- e2e-friendly testing
+- backend engineering habits before adding real integrations

@@ -1,0 +1,18 @@
+import { Injectable } from '@nestjs/common';
+import { LlmPort } from './llm.port';
+import { Card } from '../../domain/card';
+import { QuestionTarotDTO, Style } from '../schema/tarot.schema';
+
+@Injectable()
+export class OpenAIAdapter extends LlmPort {
+  async getPrediction(
+    question: QuestionTarotDTO['question'],
+    style: Style,
+    cards: Card[],
+  ): Promise<string> {
+    const cs = cards.map((c) => c.name).join(', ');
+    return Promise.resolve(
+      `Open-AI. Answer: ${question}, cards: ${cs}, style: ${style}`,
+    );
+  }
+}

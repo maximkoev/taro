@@ -32,7 +32,9 @@ describe('Deck', () => {
     const res = d.draw(originalDeck.length + 10);
     expect(res).toHaveLength(originalDeck.length);
     // Should contain same elements as original (order may differ).
-    expect(res.sort()).toEqual(ORIGINAL_DECK_COPY.sort());
+    expect([...res].sort((a, b) => a.id.localeCompare(b.id))).toEqual(
+      [...ORIGINAL_DECK_COPY].sort((a, b) => a.id.localeCompare(b.id)),
+    );
   });
 
   it('throws RangeError for non-integer input (e.g., 2.7)', () => {
@@ -48,7 +50,12 @@ describe('Deck', () => {
   it('shuffles deterministically when Math.random is mocked (all zeros)', () => {
     mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
 
-    const smallDeck = ['A', 'B', 'C', 'D'];
+    const smallDeck = [
+      { locale_id: 'a', name: 'A' },
+      { locale_id: 'b', name: 'B' },
+      { locale_id: 'c', name: 'C' },
+      { locale_id: 'd', name: 'D' },
+    ];
     const desc = Object.getOwnPropertyDescriptor(
       Deck.prototype,
       'deck',
@@ -63,7 +70,12 @@ describe('Deck', () => {
     try {
       const d = new Deck();
       const res = d.draw(4);
-      const expected = ['B', 'C', 'D', 'A'];
+      const expected = [
+        { locale_id: 'b', name: 'B' },
+        { locale_id: 'c', name: 'C' },
+        { locale_id: 'd', name: 'D' },
+        { locale_id: 'a', name: 'A' },
+      ];
       expect(res).toEqual(expected);
     } finally {
       Object.defineProperty(Deck.prototype, 'deck', desc);

@@ -22,9 +22,9 @@ describe('HealthController', () => {
 
   it('should return OK from /health', () => {
     const getHealthSpy = jest.spyOn(service, 'getHealth');
-    getHealthSpy.mockReturnValue('OK');
+    getHealthSpy.mockReturnValue({ status: 'ok' });
 
-    expect(controller.health()).toBe('OK');
+    expect(controller.health()).toStrictEqual({ status: 'ok' });
     expect(getHealthSpy).toHaveBeenCalledTimes(1);
   });
 });
