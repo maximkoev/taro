@@ -179,8 +179,6 @@ npm run build
 
 Current:
 - `PORT=3000`
-
-Planned for M3:
 - `LLM_PROVIDER=fake|openai`
 - `LLM_API_KEY=...`
 
