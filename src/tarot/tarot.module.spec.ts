@@ -6,14 +6,13 @@ import { TarotController } from './tarot.controller';
 import { TarotService } from './tarot.service';
 import { FakeLLMAdapter } from './llm/fake-llm.adapter';
 import { LlmPort } from './llm/llm.port';
-import { OpenAIAdapter } from './llm/openai.adapter';
+import { OpenAILlmAdapter } from './llm/openai-llm-adapter.service';
 
 describe('TarotModule', () => {
   const compileModule = async (
     llmProvider?: string,
   ): Promise<TestingModule> => {
-    const loadConfig = () =>
-      llmProvider ? { LLM_PROVIDER: llmProvider } : {};
+    const loadConfig = () => (llmProvider ? { LLM_PROVIDER: llmProvider } : {});
 
     return Test.createTestingModule({
       imports: [
@@ -44,10 +43,10 @@ describe('TarotModule', () => {
         expect.arrayContaining([
           TarotService,
           FakeLLMAdapter,
-          OpenAIAdapter,
+          OpenAILlmAdapter,
           expect.objectContaining({
             provide: LlmPort,
-            inject: [ConfigService, OpenAIAdapter, FakeLLMAdapter],
+            inject: [ConfigService, OpenAILlmAdapter, FakeLLMAdapter],
             useFactory: expect.any(Function),
           }),
         ]),
@@ -77,7 +76,7 @@ describe('TarotModule', () => {
   it('resolves OpenAIAdapter when LLM_PROVIDER is openai', async () => {
     const moduleRef = await compileModule('openai');
 
-    expect(moduleRef.get(LlmPort)).toBe(moduleRef.get(OpenAIAdapter));
+    expect(moduleRef.get(LlmPort)).toBe(moduleRef.get(OpenAILlmAdapter));
 
     await moduleRef.close();
   });

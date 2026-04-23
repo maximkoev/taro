@@ -3,7 +3,7 @@ import { TarotController } from './tarot.controller';
 import { TarotService } from './tarot.service';
 import { LlmPort } from './llm/llm.port';
 import { FakeLLMAdapter } from './llm/fake-llm.adapter';
-import { OpenAIAdapter } from './llm/openai.adapter';
+import { OpenAILlmAdapter } from './llm/openai-llm-adapter.service';
 import { ConfigService } from '@nestjs/config';
 
 @Module({
@@ -12,13 +12,13 @@ import { ConfigService } from '@nestjs/config';
   providers: [
     TarotService,
     FakeLLMAdapter,
-    OpenAIAdapter,
+    OpenAILlmAdapter,
     {
       provide: LlmPort,
-      inject: [ConfigService, OpenAIAdapter, FakeLLMAdapter],
+      inject: [ConfigService, OpenAILlmAdapter, FakeLLMAdapter],
       useFactory: (
         configService: ConfigService,
-        openai: OpenAIAdapter,
+        openai: OpenAILlmAdapter,
         fake: FakeLLMAdapter,
       ) =>
         configService.get<string>('LLM_PROVIDER') === 'openai' ? openai : fake,

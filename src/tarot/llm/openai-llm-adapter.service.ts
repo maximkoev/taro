@@ -4,7 +4,7 @@ import { Card } from '../../domain/card';
 import { QuestionTarotDTO, Style } from '../schema/tarot.schema';
 
 @Injectable()
-export class OpenAIAdapter extends LlmPort {
+export class OpenAILlmAdapter extends LlmPort {
   async getPrediction(
     question: QuestionTarotDTO['question'],
     style: Style,
