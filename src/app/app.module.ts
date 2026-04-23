@@ -6,9 +6,14 @@ import { LoggerMiddleware } from '../common/middleware/logging.middleware';
 import { ShutdownLoggerService } from '../common/shutdown.service';
 import { HealthModule } from '../health/health.module';
 import { TarotModule } from '../tarot/tarot.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [HealthModule, TarotModule],
+  imports: [
+    HealthModule,
+    TarotModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+  ],
   controllers: [AppController],
   providers: [AppService, ShutdownLoggerService],
 })

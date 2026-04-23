@@ -1,7 +1,7 @@
-export function isNonNegativeInteger(value: any): value is number {
+export function isNonNegativeInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0;
 }
 
-export function isNonEmptyString(value: any): boolean {
+export function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }

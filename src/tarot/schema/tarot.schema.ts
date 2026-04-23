@@ -1,6 +1,10 @@
 import * as z from 'zod';
 
 const cardsValidNumbers = [3, 6];
+export const StyleSchema = z.enum(
+  ['soft', 'hard'],
+  "Style must be either 'soft' or 'hard'",
+);
 
 export const QuestionTaroSchema = z
   .object({
@@ -12,7 +16,7 @@ export const QuestionTaroSchema = z
         (n) => cardsValidNumbers.includes(n),
         `Cards must be one of the following values: ${cardsValidNumbers.join(',')}`,
       ),
-    style: z.enum(['soft', 'hard'], "Style must be either 'soft' or 'hard'"),
+    style: StyleSchema,
   })
   .required();
 
@@ -25,5 +29,5 @@ export const PredictionTarotSchema = z
   .required();
 
 export type QuestionTarotDTO = z.infer<typeof QuestionTaroSchema>;
-
+export type Style = z.infer<typeof StyleSchema>;
 export type PredictionTarotDTO = z.infer<typeof PredictionTarotSchema>;

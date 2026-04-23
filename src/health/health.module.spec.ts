@@ -24,6 +24,6 @@ describe('HealthModule', () => {
   });
 
   it('HealthService#getHealth should return OK', () => {
-    expect(healthService.getHealth()).toBe('OK');
+    expect(healthService.getHealth()).toStrictEqual({ status: 'ok' });
   });
 });

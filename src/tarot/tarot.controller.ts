@@ -1,11 +1,12 @@
 import { Controller, Post } from '@nestjs/common';
 import { TarotService } from './tarot.service';
+
+import { ZodBody } from '../common/decorators/zod-body.decorator';
 import {
-  QuestionTarotDTO,
   PredictionTarotDTO,
   QuestionTaroSchema,
-} from './tarot.schema';
-import { ZodBody } from '../common/decorators/zod-body.decorator';
+  QuestionTarotDTO,
+} from './schema/tarot.schema';
 
 @Controller('tarot')
 export class TarotController {
@@ -13,7 +14,7 @@ export class TarotController {
   @Post()
   tarot(
     @ZodBody(QuestionTaroSchema) body: QuestionTarotDTO,
-  ): PredictionTarotDTO {
+  ): Promise<PredictionTarotDTO> {
     return this.tarotService.tarot(body);
   }
 }
