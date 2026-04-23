@@ -7,7 +7,7 @@ import { TAROT_READER_PROMPT } from './prompts/tarot.prompt';
 
 @Injectable()
 export class OpenAILlmAdapter extends LlmPort {
-  private client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  private client = new OpenAI();
   async getPrediction(
     question: string,
     style: Style,

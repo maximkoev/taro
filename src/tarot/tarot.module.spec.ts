@@ -26,6 +26,8 @@ describe('TarotModule', () => {
     }).compile();
   };
 
+  beforeEach(() => (process.env.OPENAI_API_KEY = 'api-key'));
+
   it('declares the expected controllers and providers', () => {
     const controllers = Reflect.getMetadata('controllers', TarotModule) as
       | any[]

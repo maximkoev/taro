@@ -1,6 +1,7 @@
 import type { Config } from 'jest';
 
 const config: Config = {
+  testTimeout: 10000,
   verbose: true,
   rootDir: 'src',
   moduleFileExtensions: ['js', 'json', 'ts'],

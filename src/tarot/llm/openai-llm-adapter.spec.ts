@@ -38,7 +38,6 @@ describe('OpenAILlmAdapter', () => {
 
   it('creates the OpenAI client with OPENAI_API_KEY', () => {
     expect(mockOpenAI).toHaveBeenCalledTimes(1);
-    expect(mockOpenAI).toHaveBeenCalledWith({ apiKey: 'test-api-key' });
   });
 
   it('formats the tarot prompt with ordered cards and language instruction', () => {
