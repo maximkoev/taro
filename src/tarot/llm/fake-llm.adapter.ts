@@ -1,12 +1,12 @@
 import { LlmPort } from './llm.port';
 import { Injectable } from '@nestjs/common';
 import { Card } from '../../domain/card';
-import { QuestionTarotDTO, Style } from '../schema/tarot.schema';
+import { Style } from '../schema/tarot.schema';
 
 @Injectable()
 export class FakeLLMAdapter extends LlmPort {
   async getPrediction(
-    question: QuestionTarotDTO['question'],
+    question: string,
     style: Style,
     cards: Card[],
   ): Promise<string> {

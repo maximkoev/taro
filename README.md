@@ -19,9 +19,9 @@ The project is developed milestone by milestone so each change can be delivered 
 - NestJS
 - Jest + Supertest
 - Zod
+- Real LLM provider integration
 
 Planned later:
-- Real LLM provider integration
 - Structured logging with `pino` / `nestjs-pino`
 - Postgres
 - Redis

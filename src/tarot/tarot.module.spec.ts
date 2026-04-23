@@ -6,7 +6,7 @@ import { TarotController } from './tarot.controller';
 import { TarotService } from './tarot.service';
 import { FakeLLMAdapter } from './llm/fake-llm.adapter';
 import { LlmPort } from './llm/llm.port';
-import { OpenAILlmAdapter } from './llm/openai-llm-adapter.service';
+import { OpenAILlmAdapter } from './llm/openai-llm-adapter';
 
 describe('TarotModule', () => {
   const compileModule = async (
