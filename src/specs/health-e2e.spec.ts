@@ -1,12 +1,14 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { createE2EApp } from './e2e.setup';
-import {uuidRegex} from "../common/utils/uuid.util";
+import { uuidRegex } from '../common/utils/uuid.util';
 
 describe('Health (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
+    process.env.LLM_PROVIDER = 'fake';
+    process.env.OPENAI_API_KEY = 'test-key';
     app = await createE2EApp();
   });
 

@@ -12,10 +12,10 @@ describe('E2E', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+    process.env.LLM_PROVIDER = 'fake';
     app = await createE2EApp();
   });
-
-  beforeEach(() => (process.env.OPENAI_API_KEY = 'test-key'));
 
   afterAll(async () => await app.close());
 
@@ -228,7 +228,6 @@ describe('E2E', () => {
     });
 
     it('returns 500 and internal server error body when service throws', async () => {
-      process.env.OPENAI_API_KEY = 'key';
       const mock = {
         tarot: jest.fn().mockImplementation(() => {
           throw new Error('unexpected');
