@@ -8,7 +8,7 @@ export const StyleSchema = z.enum(
 
 export const QuestionTaroSchema = z
   .object({
-    question: z.string().min(1, 'Question is required'),
+    question: z.string().min(1, 'Question is required').max(255),
     cards: z
       .number()
       .int()

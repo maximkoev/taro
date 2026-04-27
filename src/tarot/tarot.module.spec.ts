@@ -8,7 +8,16 @@ import { FakeLLMAdapter } from './llm/fake-llm.adapter';
 import { LlmPort } from './llm/llm.port';
 import { OpenAILlmAdapter } from './llm/openai-llm-adapter';
 
+type FactoryProviderMetadata = {
+  inject: unknown[];
+  provide: unknown;
+  useFactory: (...args: unknown[]) => unknown;
+};
+
 describe('TarotModule', () => {
+  const originalLlmProvider = process.env.LLM_PROVIDER;
+  const originalOpenAIApiKey = process.env.OPENAI_API_KEY;
+
   const compileModule = async (
     llmProvider?: string,
   ): Promise<TestingModule> => {
@@ -26,12 +35,27 @@ describe('TarotModule', () => {
     }).compile();
   };
 
+  beforeEach(() => {
+    process.env.OPENAI_API_KEY = 'api-key';
+    delete process.env.LLM_PROVIDER;
+  });
+
+  afterAll(() => {
+    process.env.OPENAI_API_KEY = originalOpenAIApiKey;
+    if (originalLlmProvider === undefined) {
+      delete process.env.LLM_PROVIDER;
+      return;
+    }
+
+    process.env.LLM_PROVIDER = originalLlmProvider;
+  });
+
   it('declares the expected controllers and providers', () => {
     const controllers = Reflect.getMetadata('controllers', TarotModule) as
-      | any[]
+      | unknown[]
       | undefined;
     const providers = Reflect.getMetadata('providers', TarotModule) as
-      | any[]
+      | unknown[]
       | undefined;
 
     if (controllers) {
@@ -44,13 +68,24 @@ describe('TarotModule', () => {
           TarotService,
           FakeLLMAdapter,
           OpenAILlmAdapter,
-          expect.objectContaining({
-            provide: LlmPort,
-            inject: [ConfigService, OpenAILlmAdapter, FakeLLMAdapter],
-            useFactory: expect.any(Function),
-          }),
         ]),
       );
+
+      const llmProvider = providers.find(
+        (provider): provider is FactoryProviderMetadata =>
+          typeof provider === 'object' &&
+          provider !== null &&
+          'provide' in provider &&
+          provider.provide === LlmPort,
+      );
+
+      expect(llmProvider).toBeDefined();
+      expect(llmProvider?.inject).toEqual([
+        ConfigService,
+        OpenAILlmAdapter,
+        FakeLLMAdapter,
+      ]);
+      expect(typeof llmProvider?.useFactory).toBe('function');
     }
 
     // Basic sanity: module should be defined

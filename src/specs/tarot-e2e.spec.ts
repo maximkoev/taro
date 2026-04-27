@@ -12,6 +12,8 @@ describe('E2E', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
+    process.env.OPENAI_API_KEY = 'test-key';
+    process.env.LLM_PROVIDER = 'fake';
     app = await createE2EApp();
   });
 
