@@ -7,9 +7,14 @@ import { ShutdownLoggerService } from '../common/shutdown.service';
 import { HealthModule } from '../health/health.module';
 import { TarotModule } from '../tarot/tarot.module';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from '../user/user.module';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Module({
   imports: [
+    UserModule,
     HealthModule,
     TarotModule,
     ConfigModule.forRoot({ isGlobal: true }),
