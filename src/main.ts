@@ -2,9 +2,6 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { Logger } from '@nestjs/common';
 import { UnexpectedErrorsFilter } from './common/filters/unexpected-exception.filter';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
 
 const logger = new Logger('Bootstrap');
 async function bootstrap() {

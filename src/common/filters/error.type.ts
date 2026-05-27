@@ -8,7 +8,7 @@ export type ApiResponseError = {
 export type PrismaErrorConfig = {
   status: HttpStatus;
   publicMessage: string;
-  logLevel?: 'warn' | 'error';
+  logLevel: 'warn' | 'error';
 };
 
 export function buildError(
