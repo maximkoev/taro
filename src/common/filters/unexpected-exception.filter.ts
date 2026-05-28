@@ -9,6 +9,7 @@ import {
 import { HttpAdapterHost } from '@nestjs/core';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { Request } from 'express';
+import { ApiResponseError, buildError } from './error.type';
 
 @Catch()
 export class UnexpectedErrorsFilter implements ExceptionFilter {
@@ -41,19 +42,23 @@ export class UnexpectedErrorsFilter implements ExceptionFilter {
   ): void {
     const { httpAdapter } = this.httpAdapterHost;
 
-    const responseBody = {
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      timestamp: new Date().toISOString(),
-      message: 'Internal server error',
-    };
-
-    const id = ctx.getRequest<Request>().requestId;
+    const { requestId } = ctx.getRequest<Request>();
 
     this.logger.error(
-      { message: 'An unexpected error occurred', requestId: id },
+      { message: 'An unexpected error occurred', requestId },
       exception instanceof Error ? exception.stack : String(exception),
     );
 
-    httpAdapter.reply(ctx.getResponse(), responseBody, responseBody.statusCode);
+    httpAdapter.reply(
+      ctx.getResponse(),
+      this.internalServerError,
+      this.internalServerError.statusCode,
+    );
+  }
+  private get internalServerError(): ApiResponseError {
+    return buildError(
+      'Internal server error',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
 }

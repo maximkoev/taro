@@ -1,0 +1,33 @@
+# .github/workflows/node-job.yml
+name: Node Job
+
+on:
+  workflow_call:
+    inputs:
+      command:
+        required: true
+        type: string
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment: unit
+    env:
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_HOST: db
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx prisma generate
+
+      - run: ${{ inputs.command }}

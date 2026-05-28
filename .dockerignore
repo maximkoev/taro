@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+
+node_modules
+dist
+coverage
+src/coverage
+
+.git
+.gitignore
+
+graphify-out
+generated
+
+npm-debug.log*

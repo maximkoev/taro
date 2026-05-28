@@ -6,83 +6,29 @@ on:
 
 jobs:
   lint:
-    name: Lint
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
+    name: 'Run linting'
+    uses: ./.github/workflows/node-job.yml
+    secrets: inherit
+    with:
+      command: npm run lint
 
   test:
-    name: Test
-    runs-on: ubuntu-latest
-    environment: unit
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
-
-  coverage:
-    name: Coverage
-    runs-on: ubuntu-latest
-    environment: unit
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Generate code coverage report
-        run: npm run test:cov
+    name: 'Run Unit tests'
+    uses: ./.github/workflows/node-job.yml
+    secrets: inherit
+    with:
+      command: npm test
 
   build:
-    name: Build
-    runs-on: ubuntu-latest
+    name: 'Build application'
+    uses: ./.github/workflows/node-job.yml
+    secrets: inherit
+    with:
+      command: npm run build
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
+  test_coverage:
+    name: 'Run tests with coverage'
+    uses: ./.github/workflows/node-job.yml
+    secrets: inherit
+    with:
+      command: npm run test:cov

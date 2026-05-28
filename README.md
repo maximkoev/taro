@@ -115,20 +115,109 @@ Features:
 - `LlmPort` interface
 - `FakeLlmAdapter` for deterministic tests
 - provider switch via env such as `LLM_PROVIDER=fake|openai`
+- real OpenAI adapter
 
 DoD:
 - tests do not require a real API key
 - external calls have timeouts
 - provider config comes from env
 
-### M4.1 — Persistence (optional)
+### M5.1 — Prisma + database bootstrap
 
-- store reading history
-- `GET /v1/tarot/readings/:id`
+Features:
+- Prisma setup
+- PostgreSQL connection
+- first Prisma schema
+- first migration
+- Nest integration with Prisma client
 
-### M5 — Rate limiting / cache (optional)
+DoD:
+- app connects to PostgreSQL
+- initial migration is created and applied
+- Prisma client is available in the application
 
-- rate limit by IP or API key
+### M5.2 — User registration v1
+
+Features:
+- `User` model with `id`, `name`, `passwordHash`, timestamps
+- registration endpoint
+- password hashing before save
+
+DoD:
+- user can register
+- password is never stored in plain text
+- user record is persisted in the database
+
+### M5.3 — User schema evolution
+
+Features:
+- replace `name` with `firstName` and `lastName`
+- add and apply a new migration
+- update API and persistence logic accordingly
+
+DoD:
+- second migration is created and applied
+- application works with the updated schema
+- old single-name field is removed from the model
+
+### M5.4 — Email + login
+
+Features:
+- add `email` field to `User`
+- unique constraint for email
+- login endpoint
+- password verification
+
+DoD:
+- user can log in with email and password
+- duplicate emails are rejected
+- password verification works correctly
+
+### M5.5 — Authentication
+
+Features:
+- JWT-based authentication
+- protected endpoint such as `GET /v1/users/me`
+- auth guard / token validation
+
+DoD:
+- protected routes require a valid token
+- authenticated user can fetch their own profile
+- invalid token is rejected
+
+### M5.6 — Cards in database
+
+Features:
+- tarot cards stored in the database instead of hardcoded list
+- Prisma queries for reading cards
+- seed or initialization strategy for cards
+
+DoD:
+- app can read cards from the database
+- hardcoded deck is no longer required for runtime
+- seed/init process is documented
+
+### M5.7 — Docker + runtime config
+
+Features:
+- Dockerfile
+- docker-compose for app + PostgreSQL
+- environment-based CORS configuration
+
+DoD:
+- app runs in Docker
+- app can connect to PostgreSQL in Docker
+- CORS is configured through environment variables
+
+### Later / optional
+
+- reading history
+- continue chat on top of previous reading context
+- email verification
+- phone number
+- rate limiting / cache
+- Redis
+- structured logging with `pino` / `nestjs-pino`
 
 ## Project Structure
 
