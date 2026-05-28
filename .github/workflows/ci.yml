@@ -10,17 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - &checkout
+        name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - &node
+        name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
+      - &npm-install
+        name: Install dependencies
         run: npm ci
+
+      - &prisma-generate
+        name: Generate Prisma client
+        run: npx prisma generate
 
       - name: Run ESLint
         run: npm run lint
@@ -31,17 +38,10 @@ jobs:
     environment: unit
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - *checkout
+      - *node
+      - *npm-install
+      - *prisma-generate
 
       - name: Run tests
         run: npm test
@@ -52,17 +52,10 @@ jobs:
     environment: unit
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - *checkout
+      - *node
+      - *npm-install
+      - *prisma-generate
 
       - name: Generate code coverage report
         run: npm run test:cov
@@ -72,17 +65,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - *checkout
+      - *node
+      - *npm-install
 
       - name: Build project
         run: npm run build
