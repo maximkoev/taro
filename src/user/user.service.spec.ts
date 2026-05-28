@@ -27,7 +27,7 @@ describe('UserService', () => {
 
     await expect(
       service.create({ name: 'mira', password: 'secret1' }),
-    ).resolves.toBe('User mira created');
+    ).resolves.toStrictEqual({ message: 'User mira created' });
 
     expect(hashMock).toHaveBeenCalledWith('secret1', 10);
     expect(prisma.user.create).toHaveBeenCalledWith({

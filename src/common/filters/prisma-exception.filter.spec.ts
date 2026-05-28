@@ -30,7 +30,7 @@ describe('PrismaClientExceptionFilter', () => {
       response,
     );
     const loggerSpy = jest
-      .spyOn(Logger.prototype, 'error')
+      .spyOn(Logger.prototype, 'warn')
       .mockImplementation(() => undefined);
 
     filter.catch(exception as any, host);
