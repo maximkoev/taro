@@ -23,7 +23,6 @@ describe('PrismaClientExceptionFilter', () => {
     const exception = {
       code: 'P2002',
       message: 'Unique constraint failed on username',
-      stack: 'stacktrace',
     };
     const host = createHost(
       { requestId: 'req-1', method: 'POST', url: '/user' },
@@ -44,16 +43,13 @@ describe('PrismaClientExceptionFilter', () => {
       }),
       HttpStatus.CONFLICT,
     );
-    expect(loggerSpy).toHaveBeenCalledWith(
-      {
-        requestId: 'req-1',
-        prismaCode: 'P2002',
-        message: 'Unique constraint failed on username',
-        method: 'POST',
-        url: '/user',
-      },
-      'stacktrace',
-    );
+    expect(loggerSpy).toHaveBeenCalledWith({
+      requestId: 'req-1',
+      prismaCode: 'P2002',
+      message: 'Unique constraint failed on username',
+      method: 'POST',
+      url: '/user',
+    });
   });
 
   it('rethrows unmapped Prisma errors', () => {
