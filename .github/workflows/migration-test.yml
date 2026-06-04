@@ -48,6 +48,9 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
+      - name: Seed database
+        run: npx prisma db seed
+
       - name: Apply committed migrations
         run: npx prisma migrate deploy
 
