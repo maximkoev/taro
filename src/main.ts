@@ -2,12 +2,16 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { Logger } from '@nestjs/common';
 import { UnexpectedErrorsFilter } from './common/filters/unexpected-exception.filter';
+import { PrismaClientExceptionFilter } from './common/filters/prisma-exception.filter';
 
 const logger = new Logger('Bootstrap');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const host = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new UnexpectedErrorsFilter(host));
+  app.useGlobalFilters(
+    new UnexpectedErrorsFilter(host),
+    new PrismaClientExceptionFilter(host),
+  );
   app.setGlobalPrefix('v1', { exclude: ['health'] });
   app.enableShutdownHooks(['SIGTERM', 'SIGINT']);
   app.enableCors();

@@ -32,3 +32,7 @@ jobs:
     secrets: inherit
     with:
       command: npm run test:cov
+
+  test_migration:
+    name: 'Run tests with migration'
+    uses: ./.github/workflows/migration-test.yml
