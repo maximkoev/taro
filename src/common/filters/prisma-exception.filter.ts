@@ -30,7 +30,7 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
       url: request.url,
     };
 
-    this.logger[config.logLevel](logPayload, error.stack);
+    this.logger[config.logLevel](logPayload);
     httpAdapter.reply(ctx.getResponse(), errorPayload, config.status);
   }
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
