@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --config jest.config.ts",
     "migrate:dev": "prisma migrate dev",
     "db:up": "docker compose  --env-file .env -f infra/compose.yml up -d db",
-    "test:migration:schema": "psql \"postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}\" -v ON_ERROR_STOP=1 -f prisma/test/user-schema.spec.sql"
+    "test:migration:schema": "psql postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB} -v ON_ERROR_STOP=1 -f prisma/test/user-schema.spec.sql",
+    "db:seed": "psql postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB} -v ON_ERROR_STOP=1  -f prisma/seed/seed_user.sql"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
