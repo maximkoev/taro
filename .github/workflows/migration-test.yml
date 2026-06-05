@@ -50,17 +50,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Apply init migration
-        run: psql "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}" -v ON_ERROR_STOP=1 -f prisma/migrations/20260515132956_init_user/migration.sql
+      - name: Apply committed migrations
+        run: npx prisma migrate deploy
 
       - name: Seed database with old user test data
         run: npx prisma db seed
 
-      - name: Apply committed migrations
-        run: npx prisma migrate deploy
+      - name: Apply backfill migration
+        run: psql "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}" -v ON_ERROR_STOP=1 -f prisma/migrations/20260604122258_backfill_user_first_last_name/migration.sql
 
       - name: Check user table columns
         run: npm run test:migration:schema
