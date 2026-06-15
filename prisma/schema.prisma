@@ -10,8 +10,9 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email String @unique
+  isTemporaryEmail Boolean @default(false)
   firstName String
-  lastName String
+  lastName String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   passwordHash  String
