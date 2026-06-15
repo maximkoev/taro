@@ -9,8 +9,9 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  username     String   @unique
-  firstName String?
+  email String @unique
+  isTemporaryEmail Boolean @default(false)
+  firstName String
   lastName String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
