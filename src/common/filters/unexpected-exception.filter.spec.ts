@@ -67,4 +67,38 @@ describe('UnexpectedErrorsFilter', () => {
 
     loggerSpy.mockRestore();
   });
+
+  it('should stringify unexpected values that are not Error instances', () => {
+    const reply = jest.fn();
+    const filter = new UnexpectedErrorsFilter({
+      httpAdapter: { reply },
+    } as any);
+    const host = {
+      switchToHttp: () => ({
+        getRequest: () => ({ requestId: 'abc-456' }),
+        getResponse: () => ({ response: true }),
+      }),
+    };
+    const loggerSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => undefined);
+
+    filter.catch('plain failure', host as any);
+
+    expect(loggerSpy).toHaveBeenCalledWith(
+      {
+        message: 'An unexpected error occurred',
+        requestId: 'abc-456',
+      },
+      'plain failure',
+    );
+    expect(reply).toHaveBeenCalledWith(
+      { response: true },
+      expect.objectContaining({
+        message: 'Internal server error',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      }),
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  });
 });

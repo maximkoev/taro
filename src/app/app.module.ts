@@ -8,16 +8,26 @@ import { HealthModule } from '../health/health.module';
 import { TarotModule } from '../tarot/tarot.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from '../user/user.module';
+import { AuthModule } from '../auth/auth.module';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Module({
   imports: [
     UserModule,
     HealthModule,
     TarotModule,
+    AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
-  providers: [AppService, ShutdownLoggerService],
+  providers: [
+    AppService,
+    ShutdownLoggerService,
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

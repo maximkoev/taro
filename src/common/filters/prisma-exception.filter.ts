@@ -1,5 +1,14 @@
-import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  Inject,
+  Logger,
+} from '@nestjs/common';
+import {
+  HttpAdapterHost,
+  type HttpAdapterHost as HttpAdapterHostDependency,
+} from '@nestjs/core';
 import { Request } from 'express';
 import { Prisma } from '../../../generated/prisma/client';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
@@ -10,7 +19,10 @@ import { PRISMA_ERROR_MAP } from './prisma-error.map';
 export class PrismaClientExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(PrismaClientExceptionFilter.name);
 
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
+  constructor(
+    @Inject(HttpAdapterHost)
+    private readonly httpAdapterHost: HttpAdapterHostDependency,
+  ) {}
 
   private handleError(
     error: Prisma.PrismaClientKnownRequestError,

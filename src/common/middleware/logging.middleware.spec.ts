@@ -18,9 +18,7 @@ describe('LoggerMiddleware', () => {
 
   beforeEach(() => {
     logSpy = jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
-    warnSpy = jest
-      .spyOn(Logger.prototype, 'warn')
-      .mockImplementation(() => {});
+    warnSpy = jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => {});
 
     middleware = new LoggerMiddleware();
     req = {
@@ -63,9 +61,7 @@ describe('LoggerMiddleware', () => {
 
     expect(logSpy).toHaveBeenCalledTimes(1);
     expect(logSpy.mock.calls[0][0]).toEqual(
-      expect.stringMatching(
-        /^GET \/test 200 \d+ms requestId=header-id$/,
-      ),
+      expect.stringMatching(/^GET \/test 200 \d+ms requestId=header-id$/),
     );
     expect(warnSpy).not.toHaveBeenCalled();
   });
@@ -78,6 +74,18 @@ describe('LoggerMiddleware', () => {
 
     expect(logSpy).toHaveBeenCalledTimes(1);
     expect(logSpy.mock.calls[0][0]).toContain('requestId=internal-id');
+  });
+
+  it('should use req.url when originalUrl is unavailable', () => {
+    req.originalUrl = undefined;
+    req.url = '/fallback';
+
+    middleware.use(req as Request, res as Response, next);
+    finishHandler?.();
+
+    expect(logSpy.mock.calls[0][0]).toEqual(
+      expect.stringMatching(/^GET \/fallback 200 \d+ms requestId=unknown$/),
+    );
   });
 
   it("should log with 'unknown' requestId when none provided", () => {
@@ -111,6 +119,25 @@ describe('LoggerMiddleware', () => {
     closeHandler?.();
 
     expect(logSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it('should ignore close after finish even when writableEnded is false', () => {
+    res.writableEnded = false;
+
+    middleware.use(req as Request, res as Response, next);
+    finishHandler?.();
+    closeHandler?.();
+
+    expect(logSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not log close after a completed response', () => {
+    middleware.use(req as Request, res as Response, next);
+    closeHandler?.();
+
+    expect(logSpy).not.toHaveBeenCalled();
     expect(warnSpy).not.toHaveBeenCalled();
   });
 });

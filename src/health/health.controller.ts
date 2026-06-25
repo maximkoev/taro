@@ -1,9 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { HealthService } from './health.service';
+import { Controller, Get, Inject } from '@nestjs/common';
+import {
+  HealthService,
+  type HealthService as HealthServiceDependency,
+} from './health.service';
+import { Public } from '../common/decorators/public-api.decorator';
 
+@Public()
 @Controller('health')
 export class HealthController {
-  constructor(private readonly hs: HealthService) {}
+  constructor(
+    @Inject(HealthService) private readonly hs: HealthServiceDependency,
+  ) {}
+
   @Get('')
   health(): { status: string } {
     return this.hs.getHealth();

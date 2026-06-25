@@ -7,19 +7,38 @@ import { AppModule } from '../app/app.module';
 import { TarotService } from '../tarot/tarot.service';
 import { HttpAdapterHost } from '@nestjs/core';
 import { UnexpectedErrorsFilter } from '../common/filters/unexpected-exception.filter';
+import { JwtService } from '@nestjs/jwt';
 
 describe('E2E', () => {
   let app: INestApplication;
+  let token: string;
 
   beforeAll(async () => {
     process.env.OPENAI_API_KEY = 'test-key';
     process.env.LLM_PROVIDER = 'fake';
+    process.env.JWT_SECRET = 'test-secret';
     app = await createE2EApp();
+    token = app
+      .get(JwtService)
+      .sign({ sub: 'e2e-user', email: 'e2e@example.com' });
   });
 
   afterAll(async () => await app.close());
 
   describe('Tarot (e2e)', () => {
+    it('rejects requests without a bearer token', () => {
+      const payload = {
+        question: 'Will I be lucky?',
+        cards: 3,
+        style: 'soft',
+      } as const;
+
+      return request(app.getHttpServer())
+        .post('/v1/tarot')
+        .send(payload)
+        .expect(401);
+    });
+
     it('POST /v1/tarot should return prediction with 3 cards and x-request-id', async () => {
       const payload = {
         question: 'Will I be lucky?',
@@ -29,6 +48,7 @@ describe('E2E', () => {
 
       const res = await request(app.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${token}`)
         .send(payload)
         .expect(201);
 
@@ -60,6 +80,7 @@ describe('E2E', () => {
 
       const res = await request(app.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${token}`)
         .set('x-request-id', id)
         .send(payload)
         .expect(201);
@@ -75,6 +96,7 @@ describe('E2E', () => {
       };
       return request(app.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${token}`)
         .send(payload)
         .expect(400)
         .expect((res) => {
@@ -105,6 +127,7 @@ describe('E2E', () => {
       };
       return request(app.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${token}`)
         .send(payload)
         .expect(400)
         .expect((res) => {
@@ -126,6 +149,7 @@ describe('E2E', () => {
       };
       return request(app.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${token}`)
         .send(payload)
         .expect(400)
         .expect((res) => {
@@ -147,6 +171,7 @@ describe('E2E', () => {
       };
       return request(app.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${token}`)
         .send(payload)
         .expect(400)
         .expect((res) => {
@@ -168,6 +193,7 @@ describe('E2E', () => {
       };
       return request(app.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${token}`)
         .send(payload)
         .expect(400)
         .expect((res) => {
@@ -189,6 +215,7 @@ describe('E2E', () => {
       };
       return request(app.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${token}`)
         .send(payload)
         .expect(400)
         .expect((res) => {
@@ -210,6 +237,7 @@ describe('E2E', () => {
       };
       return request(app.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${token}`)
         .send(payload)
         .expect(400)
         .expect((res) => {
@@ -244,11 +272,15 @@ describe('E2E', () => {
       appWithMock.useGlobalFilters(new UnexpectedErrorsFilter(host));
       appWithMock.setGlobalPrefix('v1', { exclude: ['health'] });
       await appWithMock.init();
+      const mockAppToken = appWithMock
+        .get(JwtService)
+        .sign({ sub: 'e2e-user', email: 'e2e@example.com' });
 
       const payload = { question: 'Boom', cards: 3, style: 'soft' };
 
       await request(appWithMock.getHttpServer())
         .post('/v1/tarot')
+        .set('Authorization', `Bearer ${mockAppToken}`)
         .send(payload)
         .expect(HttpStatus.INTERNAL_SERVER_ERROR)
         .expect((res) => {

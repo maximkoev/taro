@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Deck } from '../domain/cards';
-import { LlmPort } from './llm/llm.port';
+import { LlmPort, type LlmPort as LlmPortDependency } from './llm/llm.port';
 import {
   PredictionTarotDTO,
   QuestionTarotDTO,
@@ -10,7 +10,7 @@ import { Card } from '../domain/card';
 
 @Injectable()
 export class TarotService {
-  constructor(@Inject(LlmPort) private readonly llm: LlmPort) {}
+  constructor(@Inject(LlmPort) private readonly llm: LlmPortDependency) {}
 
   tarot(req: QuestionTarotDTO): Promise<PredictionTarotDTO> {
     const cards = new Deck().draw(req.cards);

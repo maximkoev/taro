@@ -23,16 +23,26 @@ describe('UserService', () => {
 
   it('hashes the password, creates the user, and returns a success message', async () => {
     hashMock.mockResolvedValue('hashed-password');
-    prisma.user.create.mockResolvedValue({ username: 'mira' });
+    prisma.user.create.mockResolvedValue({
+      firstName: 'Mira',
+      lastName: 'Stone',
+    });
 
     await expect(
-      service.create({ name: 'mira', password: 'secret1' }),
-    ).resolves.toStrictEqual({ message: 'User mira created' });
+      service.create({
+        firstName: 'Mira',
+        lastName: 'Stone',
+        email: 'mira@example.com',
+        password: 'secret1',
+      }),
+    ).resolves.toStrictEqual({ message: 'User Mira Stone created' });
 
     expect(hashMock).toHaveBeenCalledWith('secret1', 10);
     expect(prisma.user.create).toHaveBeenCalledWith({
       data: {
-        username: 'mira',
+        email: 'mira@example.com',
+        firstName: 'Mira',
+        lastName: 'Stone',
         passwordHash: 'hashed-password',
       },
     });

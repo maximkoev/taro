@@ -13,17 +13,22 @@ async function main() {
     data: [
       {
         id: '00000000-0000-0000-0000-000000000001',
-        username: 'Maksym Koiev',
+        firstName: 'Maksym',
+        lastName: 'Koiev',
+        email: 'temp_00000000-0000-0000-0000-000000000001@tarot.local',
         passwordHash: '$2b$10$22.02/02.02/02',
       },
       {
         id: '00000000-0000-0000-0000-000000000002',
-        username: 'Madonna',
+        firstName: 'Madonna',
+        email: 'temp_00000000-0000-0000-0000-000000000002@tarot.local',
         passwordHash: '$2b$10$22.02/02.02/02',
       },
       {
         id: '00000000-0000-0000-0000-000000000003',
-        username: 'Jean Claude Van Damme',
+        firstName: 'Jean',
+        lastName: 'Claude Van Damme',
+        email: 'temp_00000000-0000-0000-0000-000000000003@tarot.local',
         passwordHash: '$2b$10$22.02/02.02/02',
       },
     ],

@@ -4,9 +4,13 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Inject,
   Logger,
 } from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
+import {
+  HttpAdapterHost,
+  type HttpAdapterHost as HttpAdapterHostDependency,
+} from '@nestjs/core';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { Request } from 'express';
 import { ApiResponseError, buildError } from './error.type';
@@ -15,7 +19,10 @@ import { ApiResponseError, buildError } from './error.type';
 export class UnexpectedErrorsFilter implements ExceptionFilter {
   private readonly logger = new Logger(UnexpectedErrorsFilter.name);
 
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
+  constructor(
+    @Inject(HttpAdapterHost)
+    private readonly httpAdapterHost: HttpAdapterHostDependency,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();

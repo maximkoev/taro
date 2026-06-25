@@ -3,6 +3,7 @@ import { AppModule } from './app/app.module';
 import { Logger } from '@nestjs/common';
 import { UnexpectedErrorsFilter } from './common/filters/unexpected-exception.filter';
 import { PrismaClientExceptionFilter } from './common/filters/prisma-exception.filter';
+import { ZodExceptionFilter } from './common/filters/zod-exception.filter';
 
 const logger = new Logger('Bootstrap');
 async function bootstrap() {
@@ -11,6 +12,7 @@ async function bootstrap() {
   app.useGlobalFilters(
     new UnexpectedErrorsFilter(host),
     new PrismaClientExceptionFilter(host),
+    new ZodExceptionFilter(host),
   );
   app.setGlobalPrefix('v1', { exclude: ['health'] });
   app.enableShutdownHooks(['SIGTERM', 'SIGINT']);
